@@ -8,6 +8,9 @@ local inv = kap.inventory();
 // The hiera parameters for the component
 local params = inv.parameters.xelon_csi;
 
+local on_openshift =
+  std.startsWith(inv.parameters.facts.distribution, 'openshift');
+
 
 local raw_manifests = std.parseJson(
   kap.yaml_load_stream(
@@ -70,11 +73,37 @@ local manifests_by_kind =
     {}
   ) + fixupStorageClasses;
 
+local custom_rbac =
+  if on_openshift then
+    [
+      kube.RoleBinding('csi-privileged') {
+        roleRef_: kube.ClusterRole('system:openshift:scc:privileged'),
+        subjects: [
+          {
+            kind: 'ServiceAccount',
+            name: sts.spec.template.spec.serviceAccountName,
+            namespace: params.namespace,
+          }
+          for sts in manifests_by_kind.statefulset
+        ] + [
+          {
+            kind: 'ServiceAccount',
+            name: ds.spec.template.spec.serviceAccount,
+            namespace: params.namespace,
+          }
+          for ds in manifests_by_kind.daemonset
+        ],
+      },
+    ]
+  else
+    [];
+
 // Create one file per resource kind in the output
 // XXX: This currently doesn't take into account the apigroups of the
 // resources
 {
   '00_namespace': kube.Namespace(params.namespace),
+  [if std.length(custom_rbac) > 0 then '01_custom_rbac']: custom_rbac,
 } +
 {
   [kind]: manifests_by_kind[kind]

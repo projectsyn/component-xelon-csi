@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations: {}
+  labels:
+    name: csi-privileged
+  name: csi-privileged
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:privileged
+subjects:
+  - kind: ServiceAccount
+    name: xelon-csi-controller-sa
+    namespace: syn-xelon-csi
+  - kind: ServiceAccount
+    name: xelon-csi-node-sa
+    namespace: syn-xelon-csi
