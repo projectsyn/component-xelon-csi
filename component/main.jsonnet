@@ -2,6 +2,7 @@
 local com = import 'lib/commodore.libjsonnet';
 local kap = import 'lib/kapitan.libjsonnet';
 local kube = import 'lib/kube.libjsonnet';
+local sc = import 'lib/storageclass.libsonnet';
 
 local inv = kap.inventory();
 // The hiera parameters for the component
@@ -50,13 +51,24 @@ local clean_manifests = std.map(
   )
 );
 
-local manifests_by_kind = std.foldl(
-  function(sorted, it) sorted {
-    [std.asciiLower(it.kind)]+: [ it ],
-  },
-  clean_manifests,
-  {}
-);
+
+// inject storageclass config managed via component storageclass into all
+// storageclasses provided in the upstream manifests.
+local fixupStorageClasses = {
+  storageclass: [
+    s + com.makeMergeable(sc.storageClass(s.metadata.name))
+    for s in super.storageclass
+  ],
+};
+
+local manifests_by_kind =
+  std.foldl(
+    function(sorted, it) sorted {
+      [std.asciiLower(it.kind)]+: [ it ],
+    },
+    clean_manifests,
+    {}
+  ) + fixupStorageClasses;
 
 // Create one file per resource kind in the output
 // XXX: This currently doesn't take into account the apigroups of the
