@@ -7,7 +7,7 @@
       "name": "xelon-csi",
       "slug": "xelon-csi",
       "parameter_key": "xelon_csi",
-      "test_cases": "defaults",
+      "test_cases": "defaults openshift",
       "add_lib": "n",
       "add_pp": "n",
       "add_golden": "y",
