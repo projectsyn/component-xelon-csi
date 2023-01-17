@@ -64,6 +64,45 @@ local fixupStorageClasses = {
   ],
 };
 
+local fixupControllerConfig = {
+  assert std.length(super.statefulset) == 1,
+  statefulset: [
+    sts {
+      spec+: {
+        template+: {
+          spec+: {
+            containers: [
+              c {
+                env: std.filter(
+                  function(it) it != null,
+                  [
+                    if std.objectHas(params.controller.env, e.name) then (
+                      if params.controller.env[e.name] != null then
+                        local ev_raw = params.controller.env[e.name];
+                        local ev = if !std.isObject(ev_raw) then
+                          { value: ev_raw }
+                        else
+                          ev_raw;
+                        { name: e.name } + ev
+                      else
+                        null
+                    )
+                    else
+                      e
+                    for e in super.env
+                  ]
+                ),
+              }
+              for c in super.containers
+            ],
+          },
+        },
+      },
+    }
+    for sts in super.statefulset
+  ],
+};
+
 local manifests_by_kind =
   std.foldl(
     function(sorted, it) sorted {
@@ -71,7 +110,9 @@ local manifests_by_kind =
     },
     clean_manifests,
     {}
-  ) + fixupStorageClasses;
+  )
+  + fixupStorageClasses
+  + fixupControllerConfig;
 
 local custom_rbac =
   if on_openshift then
@@ -98,12 +139,21 @@ local custom_rbac =
   else
     [];
 
+local secrets = com.generateResources(
+  params.secrets,
+  function(name)
+    kube.Secret(name) {
+      data:: {},
+    }
+);
+
 // Create one file per resource kind in the output
 // XXX: This currently doesn't take into account the apigroups of the
 // resources
 {
   '00_namespace': kube.Namespace(params.namespace),
   [if std.length(custom_rbac) > 0 then '01_custom_rbac']: custom_rbac,
+  [if std.length(secrets) > 0 then '02_secrets']: secrets,
 } +
 {
   [kind]: manifests_by_kind[kind]
