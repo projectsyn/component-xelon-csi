@@ -1,0 +1,4 @@
+parameters:
+  xelon_csi:
+    =_metadata: {}
+    namespace: syn-xelon-csi

@@ -1,0 +1,25 @@
+{
+  "template": "https://github.com/projectsyn/commodore-component-template.git",
+  "commit": "f51b1864cdac0d1ab7fede3b27da83515a168655",
+  "checkout": "main",
+  "context": {
+    "cookiecutter": {
+      "name": "xelon-csi",
+      "slug": "xelon-csi",
+      "parameter_key": "xelon_csi",
+      "test_cases": "defaults",
+      "add_lib": "n",
+      "add_pp": "n",
+      "add_golden": "y",
+      "add_matrix": "y",
+      "add_go_unit": "n",
+      "copyright_holder": "VSHN AG <info@vshn.ch>",
+      "copyright_year": "2023",
+      "github_owner": "projectsyn",
+      "github_name": "component-xelon-csi",
+      "github_url": "https://github.com/projectsyn/component-xelon-csi",
+      "_template": "https://github.com/projectsyn/commodore-component-template.git"
+    }
+  },
+  "directory": null
+}
