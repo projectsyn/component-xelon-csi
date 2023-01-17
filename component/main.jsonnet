@@ -74,6 +74,9 @@ local manifests_by_kind =
 // XXX: This currently doesn't take into account the apigroups of the
 // resources
 {
+  '00_namespace': kube.Namespace(params.namespace),
+} +
+{
   [kind]: manifests_by_kind[kind]
   for kind in std.objectFields(manifests_by_kind)
 }
