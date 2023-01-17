@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: xelon-csi-node
+  namespace: syn-xelon-csi
+spec:
+  selector:
+    matchLabels:
+      app: xelon-csi-node
+  template:
+    metadata:
+      labels:
+        app: xelon-csi-node
+        role: xelon-csi-node
+    spec:
+      containers:
+        - args:
+            - --mode=node
+          image: xelonag/xelon-csi:v0.5.0
+          imagePullPolicy: Always
+          name: xelon-csi-plugin
+          securityContext:
+            allowPrivilegeEscalation: true
+            capabilities:
+              add:
+                - SYS_ADMIN
+            privileged: true
+          volumeMounts:
+            - mountPath: /csi
+              name: plugin-dir
+            - mountPath: /var/lib/kubelet
+              mountPropagation: Bidirectional
+              name: pods-mount-dir
+            - mountPath: /dev
+              name: device-dir
+            - mountPath: /etc/init.d
+              name: metadata-file
+              readOnly: true
+        - args:
+            - --v=5
+            - --csi-address=$(ADDRESS)
+            - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+          env:
+            - name: ADDRESS
+              value: /csi/csi.sock
+            - name: DRIVER_REG_SOCK_PATH
+              value: /var/lib/kubelet/plugins/csi.xelon.ch/csi.sock
+            - name: KUBE_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.0.1
+          name: csi-node-driver-registrar
+          volumeMounts:
+            - mountPath: /csi/
+              name: plugin-dir
+            - mountPath: /registration/
+              name: registration-dir
+      hostNetwork: true
+      priorityClassName: system-node-critical
+      serviceAccount: xelon-csi-node-sa
+      volumes:
+        - hostPath:
+            path: /var/lib/kubelet/plugins_registry/
+            type: DirectoryOrCreate
+          name: registration-dir
+        - hostPath:
+            path: /var/lib/kubelet/plugins/csi.xelon.ch
+            type: DirectoryOrCreate
+          name: plugin-dir
+        - hostPath:
+            path: /var/lib/kubelet
+            type: Directory
+          name: pods-mount-dir
+        - hostPath:
+            path: /dev
+          name: device-dir
+        - hostPath:
+            path: /etc/init.d
+          name: metadata-file

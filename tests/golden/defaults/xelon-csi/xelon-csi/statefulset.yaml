@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: xelon-csi-controller
+  namespace: syn-xelon-csi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xelon-csi-controller
+  serviceName: xelon-csi
+  template:
+    metadata:
+      labels:
+        app: xelon-csi-controller
+        role: xelon-csi
+    spec:
+      containers:
+        - args:
+            - --api-url=$(XELON_API_URL)
+            - --endpoint=$(CSI_ENDPOINT)
+            - --mode=controller
+            - --token=$(XELON_API_TOKEN)
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
+            - name: XELON_API_URL
+              value: INSERT_API_URL_HERE
+            - name: XELON_API_TOKEN
+              value: INSERT_TOKEN_HERE
+          image: xelonag/xelon-csi:v0.5.0
+          imagePullPolicy: Always
+          name: xelon-csi-plugin
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+            - mountPath: /etc/init.d
+              name: metadata-file
+              readOnly: true
+        - args:
+            - --csi-address=$(CSI_ADDRESS)
+            - --default-fstype=ext4
+            - --retry-interval-start=5s
+            - --worker-threads=1
+            - --v=5
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: k8s.gcr.io/sig-storage/csi-provisioner:v2.0.2
+          name: csi-provisioner
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --csi-address=$(CSI_ADDRESS)
+            - --v=5
+          env:
+            - name: CSI_ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: k8s.gcr.io/sig-storage/csi-attacher:v3.1.0
+          name: csi-attacher
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+      priorityClassName: system-cluster-critical
+      serviceAccountName: xelon-csi-controller-sa
+      volumes:
+        - emptyDir: {}
+          name: socket-dir
+        - hostPath:
+            path: /etc/init.d
+          name: metadata-file

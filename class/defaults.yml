@@ -2,3 +2,4 @@ parameters:
   xelon_csi:
     =_metadata: {}
     namespace: syn-xelon-csi
+    manifests_version: v0.5.0
