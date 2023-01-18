@@ -65,6 +65,7 @@ local fixupStorageClasses = {
 };
 
 local fixupControllerConfig = {
+  local resources(name) = std.get(params.controller.resources, name),
   assert std.length(super.statefulset) == 1,
   statefulset: [
     sts {
@@ -74,6 +75,8 @@ local fixupControllerConfig = {
             containers: [
               c {
                 imagePullPolicy: 'IfNotPresent',
+                [if resources(c.name) != null then 'resources']:
+                  std.prune(resources(c.name)),
                 env: std.filter(
                   function(it) it != null,
                   [
@@ -105,6 +108,7 @@ local fixupControllerConfig = {
 };
 
 local fixupCsiDriverConfig = {
+  local resources(name) = std.get(params.csi_driver.resources, name),
   daemonset: [
     ds {
       spec+: {
@@ -112,6 +116,8 @@ local fixupCsiDriverConfig = {
           spec+: {
             containers: [
               c {
+                [if resources(c.name) != null then 'resources']:
+                  std.prune(resources(c.name)),
                 imagePullPolicy: 'IfNotPresent',
               }
               for c in super.containers
