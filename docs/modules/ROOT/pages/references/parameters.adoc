@@ -64,6 +64,32 @@ env:
 <1> The provided string value is used as the value for field `value` of the entry in the `env` array.
 <2> The provided object value is used as-is for the entry in the `env` array.
 
+=== `controller.resources`
+
+[horizontal]
+type:: dict
+defaults:: https://github.com/projectsyn/component-xelon-csi/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+This parameter allows users to configure the CSI controller's resource requests and limits.
+Currently, the component only sets resource requests.
+
+If desired, a container's resource requests and limits can be completely cleared by setting the container's parameter value to `null`.
+
+== `csi_driver`
+
+This parameter holds configurations for the CSI driver daemonset.
+
+=== `csi_driver.resources`
+
+[horizontal]
+type:: dict
+defaults:: https://github.com/projectsyn/component-xelon-csi/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+This parameter allows users to configure the CSI driver pods' resource requests and limits.
+Currently, the component only sets resource requests.
+
+If desired, a container's resource requests and limits can be completely cleared by setting the container's parameter value to `null`.
+
 == `secrets`
 
 [horizontal]

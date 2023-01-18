@@ -11,6 +11,30 @@ parameters:
             secretKeyRef:
               name: xelon-csi
               key: api-token
+      resources:
+        xelon-csi-plugin:
+          requests:
+            cpu: 2m
+            memory: 20Mi
+        csi-attacher:
+          requests:
+            cpu: 2m
+            memory: 20Mi
+        csi-provisioner:
+          requests:
+            cpu: 2m
+            memory: 20Mi
+
+    csi_driver:
+      resources:
+        xelon-csi-plugin:
+          requests:
+            cpu: 2m
+            memory: 20Mi
+        csi-node-driver-registrar:
+          requests:
+            cpu: 2m
+            memory: 20Mi
 
     secrets:
       xelon-csi:

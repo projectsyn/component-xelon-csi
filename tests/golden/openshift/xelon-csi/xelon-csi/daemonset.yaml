@@ -19,6 +19,10 @@ spec:
           image: xelonag/xelon-csi:v0.5.0
           imagePullPolicy: IfNotPresent
           name: xelon-csi-plugin
+          resources:
+            requests:
+              cpu: 2m
+              memory: 20Mi
           securityContext:
             allowPrivilegeEscalation: true
             capabilities:
@@ -52,6 +56,10 @@ spec:
           image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.0.1
           imagePullPolicy: IfNotPresent
           name: csi-node-driver-registrar
+          resources:
+            requests:
+              cpu: 2m
+              memory: 20Mi
           volumeMounts:
             - mountPath: /csi/
               name: plugin-dir
