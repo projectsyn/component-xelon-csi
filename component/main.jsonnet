@@ -73,6 +73,7 @@ local fixupControllerConfig = {
           spec+: {
             containers: [
               c {
+                imagePullPolicy: 'IfNotPresent',
                 env: std.filter(
                   function(it) it != null,
                   [
@@ -103,6 +104,26 @@ local fixupControllerConfig = {
   ],
 };
 
+local fixupCsiDriverConfig = {
+  daemonset: [
+    ds {
+      spec+: {
+        template+: {
+          spec+: {
+            containers: [
+              c {
+                imagePullPolicy: 'IfNotPresent',
+              }
+              for c in super.containers
+            ],
+          },
+        },
+      },
+    }
+    for ds in super.daemonset
+  ],
+};
+
 local manifests_by_kind =
   std.foldl(
     function(sorted, it) sorted {
@@ -112,7 +133,8 @@ local manifests_by_kind =
     {}
   )
   + fixupStorageClasses
-  + fixupControllerConfig;
+  + fixupControllerConfig
+  + fixupCsiDriverConfig;
 
 local custom_rbac =
   if on_openshift then
@@ -151,7 +173,13 @@ local secrets = com.generateResources(
 // XXX: This currently doesn't take into account the apigroups of the
 // resources
 {
-  '00_namespace': kube.Namespace(params.namespace),
+  '00_namespace': kube.Namespace(params.namespace) {
+    [if on_openshift then 'metadata']+: {
+      annotations+: {
+        'openshift.io/node-selector': '',
+      },
+    },
+  },
   [if std.length(custom_rbac) > 0 then '01_custom_rbac']: custom_rbac,
   [if std.length(secrets) > 0 then '02_secrets']: secrets,
 } +

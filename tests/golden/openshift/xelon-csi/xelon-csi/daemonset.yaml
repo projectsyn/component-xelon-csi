@@ -17,7 +17,7 @@ spec:
         - args:
             - --mode=node
           image: xelonag/xelon-csi:v0.5.0
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: xelon-csi-plugin
           securityContext:
             allowPrivilegeEscalation: true
@@ -50,6 +50,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
           image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.0.1
+          imagePullPolicy: IfNotPresent
           name: csi-node-driver-registrar
           volumeMounts:
             - mountPath: /csi/
