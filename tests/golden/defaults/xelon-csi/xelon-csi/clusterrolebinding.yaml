@@ -1,0 +1,38 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: xelon-csi-controller-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: xelon-csi-provisioner-role
+subjects:
+  - kind: ServiceAccount
+    name: xelon-csi-controller-sa
+    namespace: syn-xelon-csi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: xelon-csi-attacher-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: xelon-csi-attacher-role
+subjects:
+  - kind: ServiceAccount
+    name: xelon-csi-controller-sa
+    namespace: syn-xelon-csi
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: xelon-csi-node-driver-registrar-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: xelon-csi-node-driver-registrar-role
+subjects:
+  - kind: ServiceAccount
+    name: xelon-csi-node-sa
+    namespace: syn-xelon-csi

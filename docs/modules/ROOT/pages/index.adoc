@@ -1,5 +1,20 @@
 = xelon-csi
 
-xelon-csi is a Commodore component to manage xelon-csi.
+xelon-csi is a Commodore component to manage the https://github.com/Xelon-AG/xelon-csi[Xelon CSI driver].
+
+The component supports installing the CSI driver in any namespace.
+The component deploys additional rolebindings on OpenShift 4 to allow the CSI driver to use the `privileged` SCC.
+
+[IMPORTANT]
+====
+The Xelon cloud doesn't support volumes which are smaller than 5Gi.
+
+To handle this restriction, the CSI driver will simply not provision PVs for PVCs which are smaller than 5Gi.
+====
+
+[IMPORTANT]
+====
+The Xelon CSI driver currently doesn't support volume expansion at all.
+====
 
 See the xref:references/parameters.adoc[parameters] reference for further details.

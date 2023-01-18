@@ -10,3 +10,6 @@ parameters:
     defaults:
       volumeBindingMode: WaitForFirstConsumer
       reclaimPolicy: Delete
+
+  facts:
+    distribution: openshift4
