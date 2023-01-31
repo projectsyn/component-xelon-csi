@@ -74,7 +74,6 @@ local fixupControllerConfig = {
           spec+: {
             containers: [
               c {
-                imagePullPolicy: 'IfNotPresent',
                 [if resources(c.name) != null then 'resources']:
                   std.prune(resources(c.name)),
                 env: std.filter(
@@ -118,7 +117,6 @@ local fixupCsiDriverConfig = {
               c {
                 [if resources(c.name) != null then 'resources']:
                   std.prune(resources(c.name)),
-                imagePullPolicy: 'IfNotPresent',
               }
               for c in super.containers
             ],
