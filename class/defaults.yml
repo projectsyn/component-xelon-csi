@@ -7,6 +7,11 @@ parameters:
     controller:
       env:
         XELON_API_URL: https://vdc.xelon.ch/api/service/
+        XELON_API_CLIENT_ID:
+          valueFrom:
+            secretKeyRef:
+              name: xelon-csi
+              key: client-id
         XELON_API_TOKEN:
           valueFrom:
             secretKeyRef:
@@ -41,3 +46,4 @@ parameters:
       xelon-csi:
         stringData:
           api-token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
+          client-id: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
