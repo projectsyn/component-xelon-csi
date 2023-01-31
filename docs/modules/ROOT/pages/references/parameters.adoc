@@ -14,7 +14,7 @@ The namespace in which to deploy this component.
 
 [horizontal]
 type:: string
-default:: `v0.5.0`
+default:: https://github.com/projectsyn/component-xelon-csi/blob/master/class/defaults.yml[See `class/defaults.yml`]
 
 The version of the CSI driver that should be deployed.
 See the https://github.com/Xelon-AG/xelon-csi/releases[CSI driver GitHub releases] for available versions.
@@ -32,6 +32,11 @@ default::
 [source,yaml]
 ----
 XELON_API_URL: https://vdc.xelon.ch/api/service/
+XELON_API_CLIENT_ID:
+  valueFrom:
+    secretKeyRef:
+      name: xelon-csi
+      key: client-id
 XELON_API_TOKEN:
   valueFrom:
     secretKeyRef:
@@ -55,6 +60,11 @@ The default configuration will result in the following `env` array for the conta
 env:
   - name: XELON_API_URL <1>
     value: https://vdc.xelon.ch/api/service/
+  - name: XELON_API_CLIENT_ID <2>
+    valueFrom:
+      secretKeyRef:
+        name: xelon-csi
+        key: client-id
   - name: XELON_API_TOKEN <2>
     valueFrom:
       secretKeyRef:
@@ -101,6 +111,7 @@ default::
 xelon-csi:
   stringData:
     api-token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
+    client-id: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
 ----
 
 This parameter allows users to configure arbitrary secrets for the component.
