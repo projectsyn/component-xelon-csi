@@ -18,6 +18,7 @@ spec:
       containers:
         - args:
             - --api-url=$(XELON_API_URL)
+            - --client-id=$(XELON_API_CLIENT_ID)
             - --endpoint=$(CSI_ENDPOINT)
             - --mode=controller
             - --token=$(XELON_API_TOKEN)
@@ -26,12 +27,17 @@ spec:
               value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
             - name: XELON_API_URL
               value: https://vdc.xelon.ch/api/service/
+            - name: XELON_API_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  key: client-id
+                  name: xelon-csi
             - name: XELON_API_TOKEN
               valueFrom:
                 secretKeyRef:
                   key: api-token
                   name: xelon-csi
-          image: xelonag/xelon-csi:v0.5.0
+          image: xelonag/xelon-csi:v0.6.0
           imagePullPolicy: IfNotPresent
           name: xelon-csi-plugin
           resources:
@@ -76,6 +82,20 @@ spec:
             requests:
               cpu: 2m
               memory: 20Mi
+          volumeMounts:
+            - mountPath: /var/lib/csi/sockets/pluginproxy/
+              name: socket-dir
+        - args:
+            - --csi-address=$(ADDRESS)
+            - --timeout=30s
+            - --v=5
+            - --handle-volume-inuse-error=false
+          env:
+            - name: ADDRESS
+              value: /var/lib/csi/sockets/pluginproxy/csi.sock
+          image: k8s.gcr.io/sig-storage/csi-resizer:v1.3.0
+          imagePullPolicy: IfNotPresent
+          name: csi-resizer
           volumeMounts:
             - mountPath: /var/lib/csi/sockets/pluginproxy/
               name: socket-dir
