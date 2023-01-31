@@ -12,9 +12,4 @@ The Xelon cloud doesn't support volumes which are smaller than 5Gi.
 To handle this restriction, the CSI driver will simply not provision PVs for PVCs which are smaller than 5Gi.
 ====
 
-[IMPORTANT]
-====
-The Xelon CSI driver currently doesn't support volume expansion at all.
-====
-
 See the xref:references/parameters.adoc[parameters] reference for further details.
