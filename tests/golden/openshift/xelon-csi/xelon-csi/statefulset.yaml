@@ -60,7 +60,6 @@ spec:
             - name: CSI_ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
           image: k8s.gcr.io/sig-storage/csi-provisioner:v2.0.2
-          imagePullPolicy: IfNotPresent
           name: csi-provisioner
           resources:
             requests:
@@ -76,7 +75,6 @@ spec:
             - name: CSI_ADDRESS
               value: /var/lib/csi/sockets/pluginproxy/csi.sock
           image: k8s.gcr.io/sig-storage/csi-attacher:v3.1.0
-          imagePullPolicy: IfNotPresent
           name: csi-attacher
           resources:
             requests:
