@@ -3,7 +3,7 @@ parameters:
     =_metadata: {}
     namespace: syn-xelon-csi
     # renovate: datasource=github-releases depName=Xelon-AG/xelon-csi versioning=semver-coerced
-    manifests_version: v0.6.1
+    manifests_version: v0.7.0
     controller:
       env:
         XELON_API_URL: https://vdc.xelon.ch/api/service/
