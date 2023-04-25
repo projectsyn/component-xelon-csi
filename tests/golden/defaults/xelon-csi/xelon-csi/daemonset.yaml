@@ -16,7 +16,7 @@ spec:
       containers:
         - args:
             - --mode=node
-          image: xelonag/xelon-csi:v0.7.0
+          image: xelonag/xelon-csi:v0.8.0
           imagePullPolicy: IfNotPresent
           name: xelon-csi-plugin
           resources:
