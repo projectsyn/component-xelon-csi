@@ -19,6 +19,14 @@ default:: https://github.com/projectsyn/component-xelon-csi/blob/master/class/de
 The version of the CSI driver that should be deployed.
 See the https://github.com/Xelon-AG/xelon-csi/releases[CSI driver GitHub releases] for available versions.
 
+== `metadata_directory`
+
+[horizontal]
+type:: string
+default:: `/etc/init.d`
+
+This parameter allows users to configure which host path is mounted as `/etc/init.d` for the CSI driver and controller to expose the Xelon AG `metadata.json`.
+
 == `controller`
 
 Configurations for the CSI controller.
@@ -88,14 +96,6 @@ If desired, a container's resource requests and limits can be completely cleared
 == `csi_driver`
 
 This parameter holds configurations for the CSI driver daemonset.
-
-=== `csi_driver.metadata_directory`
-
-[horizontal]
-type:: string
-default:: `/etc/init.d`
-
-This parameter allows users to configure which host path the CSI driver daemonset mounts to expose the Xelon AG `metadata.json` to the CSI driver.
 
 === `csi_driver.resources`
 

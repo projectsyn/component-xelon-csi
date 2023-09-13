@@ -98,6 +98,17 @@ local fixupControllerConfig = {
               }
               for c in super.containers
             ],
+            volumes: [
+              if v.name == 'metadata-file' then
+                v {
+                  hostPath: {
+                    path: params.metadata_directory,
+                  },
+                }
+              else
+                v
+              for v in super.volumes
+            ],
           },
         },
       },
@@ -124,7 +135,7 @@ local fixupCsiDriverConfig = {
               if v.name == 'metadata-file' then
                 v {
                   hostPath: {
-                    path: params.csi_driver.metadata_directory,
+                    path: params.metadata_directory,
                   },
                 }
               else
