@@ -103,5 +103,5 @@ spec:
         - emptyDir: {}
           name: socket-dir
         - hostPath:
-            path: /etc/init.d
+            path: /etc/rc.d/init.d
           name: metadata-file

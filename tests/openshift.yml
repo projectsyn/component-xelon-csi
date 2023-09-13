@@ -15,5 +15,4 @@ parameters:
     distribution: openshift4
 
   xelon_csi:
-    csi_driver:
-      metadata_directory: /etc/rc.d/init.d
+    metadata_directory: /etc/rc.d/init.d
