@@ -120,6 +120,17 @@ local fixupCsiDriverConfig = {
               }
               for c in super.containers
             ],
+            volumes: [
+              if v.name == 'metadata-file' then
+                v {
+                  hostPath: {
+                    path: params.csi_driver.metadata_directory,
+                  },
+                }
+              else
+                v
+              for v in super.volumes
+            ],
           },
         },
       },
