@@ -32,6 +32,7 @@ parameters:
             memory: 20Mi
 
     csi_driver:
+      metadata_directory: /etc/init.d
       resources:
         xelon-csi-plugin:
           requests:

@@ -84,5 +84,5 @@ spec:
             path: /dev
           name: device-dir
         - hostPath:
-            path: /etc/init.d
+            path: /etc/rc.d/init.d
           name: metadata-file
