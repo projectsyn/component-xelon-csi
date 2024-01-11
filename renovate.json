@@ -18,6 +18,7 @@
   "labels": [
     "dependency"
   ],
+  "separateMinorPatch": true,
   "regexManagers": [
     {
       "fileMatch": ["class\\/defaults\\.yml"],
