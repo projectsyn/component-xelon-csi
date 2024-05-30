@@ -2,7 +2,7 @@ parameters:
   kapitan:
     dependencies:
       - type: https
-        source: https://raw.githubusercontent.com/Xelon-AG/xelon-csi/master/deploy/kubernetes/releases/xelon-csi-${xelon_csi:manifests_version}/driver.yml
+        source: https://raw.githubusercontent.com/Xelon-AG/xelon-csi/${xelon_csi:manifests_version}/deploy/kubernetes/releases/xelon-csi-${xelon_csi:manifests_version}/driver.yml
         output_path: ${_base_directory}/manifests/${xelon_csi:manifests_version}/driver.yaml
     compile:
       - input_paths:
