@@ -7,18 +7,37 @@
   "ignorePaths": [
     ".github/**"
   ],
-  "postUpgradeTasks": {
-    "commands": [
-      "make gen-golden-all"
-    ],
-    "fileFilters": [ "tests/golden/**" ],
-    "executionMode": "update"
-  },
-  "suppressNotifications": [ "artifactErrors" ],
   "labels": [
     "dependency"
   ],
   "separateMinorPatch": true,
+  "postUpgradeTasks": {
+    "commands": [
+      "make gen-golden-all"
+    ],
+    "fileFilters": [
+      "tests/golden/**"
+    ],
+    "executionMode": "update"
+  },
+  "suppressNotifications": [
+    "artifactErrors"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "matchCurrentVersion": "!/^v?0\\./",
+      "automerge": true,
+      "platformAutomerge": false,
+      "labels": [
+        "dependency",
+        "automerge",
+        "bump:patch"
+      ]
+    }
+  ],
   "regexManagers": [
     {
       "fileMatch": ["class\\/defaults\\.yml"],
@@ -26,18 +45,6 @@
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_version:\\s(?<currentValue>.*)"
       ],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
-    }
-  ],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["patch"],
-      "matchCurrentVersion": "!/^v?0\\./",
-      "automerge": true,
-      "platformAutomerge": false,
-      "labels": [
-        "dependency",
-        "automerge"
-      ]
     }
   ]
 }
