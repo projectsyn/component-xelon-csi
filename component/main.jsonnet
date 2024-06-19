@@ -177,7 +177,7 @@ local custom_rbac =
         ] + [
           {
             kind: 'ServiceAccount',
-            name: ds.spec.template.spec.serviceAccount,
+            name: ds.spec.template.spec.serviceAccountName,
             namespace: params.namespace,
           }
           for ds in manifests_by_kind.daemonset

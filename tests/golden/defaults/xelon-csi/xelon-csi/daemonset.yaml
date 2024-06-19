@@ -4,6 +4,7 @@ metadata:
   name: xelon-csi-node
   namespace: syn-xelon-csi
 spec:
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: xelon-csi-node
@@ -15,19 +16,26 @@ spec:
     spec:
       containers:
         - args:
+            - --endpoint=$(CSI_ENDPOINT)
+            - --logging-format=text
             - --mode=node
-          image: xelonag/xelon-csi:v0.8.0
-          imagePullPolicy: IfNotPresent
+            - --rescan-on-resize=true
+            - --v=2
+          env:
+            - name: CSI_ENDPOINT
+              value: unix:///csi/csi.sock
+            - name: CSI_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          image: xelonag/xelon-csi:v1.0.0
+          imagePullPolicy: Always
           name: xelon-csi-plugin
           resources:
             requests:
               cpu: 2m
               memory: 20Mi
           securityContext:
-            allowPrivilegeEscalation: true
-            capabilities:
-              add:
-                - SYS_ADMIN
             privileged: true
           volumeMounts:
             - mountPath: /csi
@@ -37,43 +45,37 @@ spec:
               name: pods-mount-dir
             - mountPath: /dev
               name: device-dir
-            - mountPath: /etc/init.d
-              name: metadata-file
-              readOnly: true
         - args:
-            - --v=5
             - --csi-address=$(ADDRESS)
             - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
+            - --v=5
           env:
             - name: ADDRESS
               value: /csi/csi.sock
             - name: DRIVER_REG_SOCK_PATH
               value: /var/lib/kubelet/plugins/csi.xelon.ch/csi.sock
-            - name: KUBE_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.0.1
+          image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.9.0
+          imagePullPolicy: IfNotPresent
           name: csi-node-driver-registrar
           resources:
             requests:
               cpu: 2m
               memory: 20Mi
           volumeMounts:
-            - mountPath: /csi/
+            - mountPath: /csi
               name: plugin-dir
-            - mountPath: /registration/
+            - mountPath: /registration
               name: registration-dir
       hostNetwork: true
       priorityClassName: system-node-critical
-      serviceAccount: xelon-csi-node-sa
+      serviceAccountName: xelon-csi-node-sa
       volumes:
         - hostPath:
             path: /var/lib/kubelet/plugins_registry/
-            type: DirectoryOrCreate
+            type: Directory
           name: registration-dir
         - hostPath:
-            path: /var/lib/kubelet/plugins/csi.xelon.ch
+            path: /var/lib/kubelet/plugins/csi.xelon.ch/
             type: DirectoryOrCreate
           name: plugin-dir
         - hostPath:
@@ -83,6 +85,3 @@ spec:
         - hostPath:
             path: /dev
           name: device-dir
-        - hostPath:
-            path: /etc/init.d
-          name: metadata-file

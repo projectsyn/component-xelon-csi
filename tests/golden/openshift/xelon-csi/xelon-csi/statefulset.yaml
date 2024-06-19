@@ -5,6 +5,7 @@ metadata:
   namespace: syn-xelon-csi
 spec:
   replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
       app: xelon-csi-controller
@@ -17,91 +18,102 @@ spec:
     spec:
       containers:
         - args:
-            - --api-url=$(XELON_API_URL)
-            - --client-id=$(XELON_API_CLIENT_ID)
             - --endpoint=$(CSI_ENDPOINT)
+            - --xelon-base-url=$(XELON_BASE_URL)
+            - --xelon-client-id=$(XELON_CLIENT_ID)
+            - --xelon-cloud-id=$(XELON_CLOUD_ID)
+            - --xelon-token=$(XELON_TOKEN)
+            - --logging-format=text
             - --mode=controller
-            - --token=$(XELON_API_TOKEN)
+            - --v=2
           env:
             - name: CSI_ENDPOINT
-              value: unix:///var/lib/csi/sockets/pluginproxy/csi.sock
-            - name: XELON_API_URL
-              value: https://vdc.xelon.ch/api/service/
-            - name: XELON_API_CLIENT_ID
+              value: unix:///csi/csi.sock
+            - name: XELON_BASE_URL
               valueFrom:
                 secretKeyRef:
-                  key: client-id
-                  name: xelon-csi
-            - name: XELON_API_TOKEN
+                  key: baseUrl
+                  name: xelon-api-credentials
+            - name: XELON_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  key: api-token
-                  name: xelon-csi
-          image: xelonag/xelon-csi:v0.8.0
-          imagePullPolicy: IfNotPresent
+                  key: clientId
+                  name: xelon-api-credentials
+            - name: XELON_CLOUD_ID
+              valueFrom:
+                secretKeyRef:
+                  key: cloudId
+                  name: xelon-api-credentials
+            - name: XELON_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  key: token
+                  name: xelon-api-credentials
+          image: xelonag/xelon-csi:v1.0.0
+          imagePullPolicy: Always
           name: xelon-csi-plugin
           resources:
             requests:
               cpu: 2m
               memory: 20Mi
           volumeMounts:
-            - mountPath: /var/lib/csi/sockets/pluginproxy/
+            - mountPath: /csi
               name: socket-dir
-            - mountPath: /etc/init.d
-              name: metadata-file
-              readOnly: true
         - args:
             - --csi-address=$(CSI_ADDRESS)
             - --default-fstype=ext4
+            - --extra-create-metadata
             - --retry-interval-start=5s
-            - --worker-threads=1
+            - --timeout=120s
             - --v=5
+            - --worker-threads=1
           env:
             - name: CSI_ADDRESS
-              value: /var/lib/csi/sockets/pluginproxy/csi.sock
-          image: registry.k8s.io/sig-storage/csi-provisioner:v2.0.2
+              value: /csi/csi.sock
+          image: registry.k8s.io/sig-storage/csi-provisioner:v3.6.0
+          imagePullPolicy: IfNotPresent
           name: csi-provisioner
           resources:
             requests:
               cpu: 2m
               memory: 20Mi
           volumeMounts:
-            - mountPath: /var/lib/csi/sockets/pluginproxy/
+            - mountPath: /csi
               name: socket-dir
         - args:
             - --csi-address=$(CSI_ADDRESS)
+            - --timeout=60s
             - --v=5
+            - --worker-threads=1
           env:
             - name: CSI_ADDRESS
-              value: /var/lib/csi/sockets/pluginproxy/csi.sock
-          image: registry.k8s.io/sig-storage/csi-attacher:v3.1.0
+              value: /csi/csi.sock
+          image: registry.k8s.io/sig-storage/csi-attacher:v4.4.0
+          imagePullPolicy: IfNotPresent
           name: csi-attacher
           resources:
             requests:
               cpu: 2m
               memory: 20Mi
           volumeMounts:
-            - mountPath: /var/lib/csi/sockets/pluginproxy/
+            - mountPath: /csi
               name: socket-dir
         - args:
-            - --csi-address=$(ADDRESS)
-            - --timeout=30s
-            - --v=5
+            - --csi-address=$(CSI_ADDRESS)
             - --handle-volume-inuse-error=false
+            - --timeout=60s
+            - --v=5
           env:
-            - name: ADDRESS
-              value: /var/lib/csi/sockets/pluginproxy/csi.sock
-          image: registry.k8s.io/sig-storage/csi-resizer:v1.3.0
+            - name: CSI_ADDRESS
+              value: /csi/csi.sock
+          image: registry.k8s.io/sig-storage/csi-resizer:v1.9.0
           imagePullPolicy: IfNotPresent
           name: csi-resizer
           volumeMounts:
-            - mountPath: /var/lib/csi/sockets/pluginproxy/
+            - mountPath: /csi
               name: socket-dir
       priorityClassName: system-cluster-critical
       serviceAccountName: xelon-csi-controller-sa
       volumes:
         - emptyDir: {}
           name: socket-dir
-        - hostPath:
-            path: /etc/rc.d/init.d
-          name: metadata-file
