@@ -4,7 +4,7 @@ parameters:
       multi_tenant: true
     namespace: syn-xelon-csi
     # renovate: datasource=github-releases depName=Xelon-AG/xelon-csi versioning=semver-coerced
-    manifests_version: v0.8.0
+    manifests_version: v1.0.0
     metadata_directory: /etc/init.d
     controller:
       env:
