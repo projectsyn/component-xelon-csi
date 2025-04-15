@@ -28,7 +28,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
-          image: xelonag/xelon-csi:v1.0.0
+          image: xelonag/xelon-csi:v1.0.1
           imagePullPolicy: Always
           name: xelon-csi-plugin
           resources:
