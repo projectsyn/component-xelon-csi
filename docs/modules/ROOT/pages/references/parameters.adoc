@@ -35,22 +35,7 @@ Configurations for the CSI controller.
 
 [horizontal]
 type:: dict
-default::
-+
-[source,yaml]
-----
-XELON_API_URL: https://vdc.xelon.ch/api/service/
-XELON_API_CLIENT_ID:
-  valueFrom:
-    secretKeyRef:
-      name: xelon-csi
-      key: client-id
-XELON_API_TOKEN:
-  valueFrom:
-    secretKeyRef:
-      name: xelon-csi
-      key: api-token
-----
+default:: {}
 
 This parameter allows users to customize the CSI controller environment variables which are present in the upstream manifests.
 The component currently doesn't support adding arbitrary other environment variables.
@@ -60,27 +45,6 @@ If the value for an entry in the parameter is already an object, it's expected t
 Any other values are first converted into strings and added to the container's `env` array as `{ "value": "input_value" }`.
 
 The component will always add the key of the parameter entry as `name: KEY`.
-
-The default configuration will result in the following `env` array for the container:
-
-[source,yaml]
-----
-env:
-  - name: XELON_API_URL <1>
-    value: https://vdc.xelon.ch/api/service/
-  - name: XELON_API_CLIENT_ID <2>
-    valueFrom:
-      secretKeyRef:
-        name: xelon-csi
-        key: client-id
-  - name: XELON_API_TOKEN <2>
-    valueFrom:
-      secretKeyRef:
-        name: xelon-csi
-        key: api-token
-----
-<1> The provided string value is used as the value for field `value` of the entry in the `env` array.
-<2> The provided object value is used as-is for the entry in the `env` array.
 
 === `controller.resources`
 
@@ -118,9 +82,12 @@ default::
 ----
 xelon-csi:
   stringData:
-    api-token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
-    client-id: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
+    baseUrl: https://vdc.xelon.ch/api/service/
+    token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
+    clientId: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
+    cloudId: '' <1>
 ----
+<1> The `cloudId` field specifies the Xelon location (ZH: `1`, AG: `6`).
 
 This parameter allows users to configure arbitrary secrets for the component.
 The component will create a secret for each key in the array, except for keys with `null` values.

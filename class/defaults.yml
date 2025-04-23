@@ -7,18 +7,7 @@ parameters:
     manifests_version: v1.0.1
     metadata_directory: /etc/init.d
     controller:
-      env:
-        XELON_API_URL: https://vdc.xelon.ch/api/service/
-        XELON_API_CLIENT_ID:
-          valueFrom:
-            secretKeyRef:
-              name: xelon-csi
-              key: client-id
-        XELON_API_TOKEN:
-          valueFrom:
-            secretKeyRef:
-              name: xelon-csi
-              key: api-token
+      env: {}
       resources:
         xelon-csi-plugin:
           requests:
@@ -47,5 +36,7 @@ parameters:
     secrets:
       xelon-api-credentials:
         stringData:
+          baseUrl: https://vdc.xelon.ch/api/service/
           token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
-          cloudId: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
+          clientId: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
+          cloudId: ''
