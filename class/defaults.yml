@@ -45,7 +45,7 @@ parameters:
             memory: 20Mi
 
     secrets:
-      xelon-csi:
+      xelon-api-credentials:
         stringData:
-          api-token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
-          client-id: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
+          token: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/api-token}
+          cloudId: ?{vaultkv:${cluster:tenant}/${cluster:name}/xelon/csi-driver/client-id}
