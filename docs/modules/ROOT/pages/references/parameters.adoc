@@ -27,6 +27,27 @@ default:: `/etc/init.d`
 
 This parameter allows users to configure which host path is mounted as `/etc/init.d` for the CSI driver and controller to expose the Xelon AG `metadata.json`.
 
+== `images`
+
+[horizontal]
+type:: dictionary
+default:: https://github.com/projectsyn/component-xelon-csi/blob/master/class/defaults.yml[See `class/defaults.yml`]
+
+Container image to use for the Xelon CSI driver.
+See the upstream list of https://github.com/xelonag/xelon-csi/releases[available versions] for supported values.
+
+[NOTE]
+====
+You can also configure the following images:
+
+* csi-provisioner
+* csi-attacher
+* csi-resizer
+* csi-node-driver-registrar
+
+You need to provide `registry`, `repository` and `tag`!
+====
+
 == `controller`
 
 Configurations for the CSI controller.
