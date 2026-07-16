@@ -3,9 +3,17 @@ parameters:
     =_metadata:
       multi_tenant: true
     namespace: syn-xelon-csi
+
     # renovate: datasource=github-releases depName=Xelon-AG/xelon-csi versioning=semver-coerced
     manifests_version: v1.0.1
     metadata_directory: /etc/init.d
+
+    images:
+      xelon-csi-plugin:
+        registry: docker.io
+        repository: xelonag/xelon-csi
+        tag: ${xelon_csi:manifests_version}
+
     controller:
       env: {}
       resources:

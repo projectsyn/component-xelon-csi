@@ -11,6 +11,9 @@ local params = inv.parameters.xelon_csi;
 local on_openshift =
   std.startsWith(inv.parameters.facts.distribution, 'openshift');
 
+local hasImageForContainer(name) =
+  local image = std.get(params.images, name, {});
+  std.objectHas(image, 'registry') && std.objectHas(image, 'repository') && std.objectHas(image, 'tag');
 
 local raw_manifests = std.parseJson(
   kap.yaml_load_stream(
@@ -76,6 +79,7 @@ local fixupControllerConfig = {
               c {
                 [if resources(c.name) != null then 'resources']:
                   std.prune(resources(c.name)),
+                [if hasImageForContainer(c.name) then 'image']: '%(registry)s/%(repository)s:%(tag)s' % std.get(params.images, c.name),
                 env: std.filter(
                   function(it) it != null,
                   [
@@ -128,6 +132,7 @@ local fixupCsiDriverConfig = {
               c {
                 [if resources(c.name) != null then 'resources']:
                   std.prune(resources(c.name)),
+                [if hasImageForContainer(c.name) then 'image']: '%(registry)s/%(repository)s:%(tag)s' % std.get(params.images, c.name),
               }
               for c in super.containers
             ],
